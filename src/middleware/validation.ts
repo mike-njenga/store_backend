@@ -410,6 +410,17 @@ export const validateCreateProduct = [
         .optional()
         .isBoolean()
         .withMessage('is_active must be a boolean'),
+    // Prevent quantity fields
+    body('quantity')
+        .optional()
+        .custom(() => {
+            throw new Error('quantity field is not allowed. Stock is managed via stock movements.');
+        }),
+    body('stock_quantity')
+        .optional()
+        .custom(() => {
+            throw new Error('stock_quantity field is not allowed. Stock is managed via stock movements.');
+        }),
     handleValidationErrors
 ];
 
@@ -475,6 +486,57 @@ export const validateUpdateProduct = [
         .withMessage('supplier_id must be a valid UUID'),
     body('is_active')
         .optional()
+        .isBoolean()
+        .withMessage('is_active must be a boolean'),
+    // Prevent quantity fields
+    body('quantity')
+        .optional()
+        .custom(() => {
+            throw new Error('quantity field is not allowed. Stock is managed via stock movements.');
+        }),
+    body('stock_quantity')
+        .optional()
+        .custom(() => {
+            throw new Error('stock_quantity field is not allowed. Stock is managed via stock movements.');
+        }),
+    handleValidationErrors
+];
+
+// Update product prices only
+export const validateUpdateProductPrice = [
+    body('purchase_price')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('purchase_price must be a positive number'),
+    body('retail_price')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('retail_price must be a positive number'),
+    body('wholesale_price')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('wholesale_price must be a positive number'),
+    body('*')
+        .custom((value, { req }) => {
+            const allowedFields = ['purchase_price', 'retail_price', 'wholesale_price'];
+            const providedFields = Object.keys(req.body);
+            const invalidFields = providedFields.filter(field => !allowedFields.includes(field));
+            if (invalidFields.length > 0) {
+                throw new Error(`Only price fields are allowed. Invalid fields: ${invalidFields.join(', ')}`);
+            }
+            if (providedFields.length === 0) {
+                throw new Error('At least one price field must be provided');
+            }
+            return true;
+        }),
+    handleValidationErrors
+];
+
+// Update product status only
+export const validateUpdateProductStatus = [
+    body('is_active')
+        .notEmpty()
+        .withMessage('is_active is required')
         .isBoolean()
         .withMessage('is_active must be a boolean'),
     handleValidationErrors
@@ -702,10 +764,6 @@ export const validateCreatePurchase = [
     body('subtotal')
         .isFloat({ min: 0 })
         .withMessage('subtotal must be a non-negative number'),
-    body('tax_amount')
-        .optional()
-        .isFloat({ min: 0 })
-        .withMessage('tax_amount must be a non-negative number'),
     body('discount_amount')
         .optional()
         .isFloat({ min: 0 })
@@ -747,10 +805,7 @@ export const validateUpdatePurchase = [
         .optional()
         .isFloat({ min: 0 })
         .withMessage('subtotal must be a non-negative number'),
-    body('tax_amount')
-        .optional()
-        .isFloat({ min: 0 })
-        .withMessage('tax_amount must be a non-negative number'),
+
     body('discount_amount')
         .optional()
         .isFloat({ min: 0 })

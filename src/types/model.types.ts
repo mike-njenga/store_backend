@@ -308,7 +308,6 @@ export interface Purchase {
 export interface CreatePurchaseInput {
   supplier_id: UUID;
   subtotal: number;
-  tax_amount?: number;
   discount_amount?: number;
   total_amount: number;
   payment_method?: string | null;
@@ -321,7 +320,6 @@ export interface CreatePurchaseInput {
 export interface UpdatePurchaseInput {
   supplier_id?: UUID;
   subtotal?: number;
-  tax_amount?: number;
   discount_amount?: number;
   total_amount?: number;
   payment_method?: string | null;
