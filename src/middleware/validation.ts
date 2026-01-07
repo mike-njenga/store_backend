@@ -951,23 +951,32 @@ export const validateCreateStockMovement = [
         .isUUID()
         .withMessage('product_id must be a valid UUID'),
     body('movement_type')
-        .isIn(Object.values(MovementType))
-        .withMessage(`movement_type must be one of: ${Object.values(MovementType).join(', ')}`),
+        .equals('adjustment')
+        .withMessage('Only adjustment movements can be created manually. Purchase and sale movements are created automatically.'),
     body('sale_item_id')
         .optional()
-        .isUUID()
-        .withMessage('sale_item_id must be a valid UUID'),
+        .custom((value) => {
+            if (value !== null && value !== undefined) {
+                throw new Error('sale_item_id must be null for adjustment movements');
+            }
+            return true;
+        }),
     body('purchase_item_id')
         .optional()
-        .isUUID()
-        .withMessage('purchase_item_id must be a valid UUID'),
+        .custom((value) => {
+            if (value !== null && value !== undefined) {
+                throw new Error('purchase_item_id must be null for adjustment movements');
+            }
+            return true;
+        }),
     body('adjustment_reason')
-        .optional()
+        .notEmpty()
+        .withMessage('adjustment_reason is required for adjustment movements')
         .isIn(Object.values(AdjustmentReason))
         .withMessage(`adjustment_reason must be one of: ${Object.values(AdjustmentReason).join(', ')}`),
     body('quantity_change')
-        .isInt()
-        .withMessage('quantity_change must be an integer')
+        .isFloat()
+        .withMessage('quantity_change must be a number')
         .custom((value) => {
             if (value === 0) {
                 throw new Error('quantity_change cannot be zero');
