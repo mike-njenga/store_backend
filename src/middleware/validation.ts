@@ -344,6 +344,16 @@ export const validateUpdateSupplier = [
     handleValidationErrors
 ];
 
+// Update supplier status only
+export const validateUpdateSupplierStatus = [
+    body('is_active')
+        .notEmpty()
+        .withMessage('is_active is required')
+        .isBoolean()
+        .withMessage('is_active must be a boolean'),
+    handleValidationErrors
+];
+
 // Product Validations
 export const validateCreateProduct = [
     body('sku')

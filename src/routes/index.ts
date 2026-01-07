@@ -2,6 +2,7 @@ import express from 'express';
 import authRoutes from './auth.route.js';
 import userRoutes from './user.route.js';
 import productRoutes from './product.route.js';
+import supplierRoutes from './supplier.route.js';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ const router = express.Router();
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/products', productRoutes);
+router.use('/suppliers', supplierRoutes);
 
 export default router;
 
