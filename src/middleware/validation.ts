@@ -645,6 +645,16 @@ export const validateUpdateCustomer = [
     handleValidationErrors
 ];
 
+// Update customer status only
+export const validateUpdateCustomerStatus = [
+    body('is_active')
+        .notEmpty()
+        .withMessage('is_active is required')
+        .isBoolean()
+        .withMessage('is_active must be a boolean'),
+    handleValidationErrors
+];
+
 // Sale Validations
 export const validateCreateSale = [
     body('customer_id')

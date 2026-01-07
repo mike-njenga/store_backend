@@ -3,6 +3,7 @@ import authRoutes from './auth.route.js';
 import userRoutes from './user.route.js';
 import productRoutes from './product.route.js';
 import supplierRoutes from './supplier.route.js';
+import customerRoutes from './customer.route.js';
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/products', productRoutes);
 router.use('/suppliers', supplierRoutes);
+router.use('/customers', customerRoutes);
 
 export default router;
 
