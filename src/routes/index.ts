@@ -5,6 +5,7 @@ import productRoutes from './product.route.js';
 import supplierRoutes from './supplier.route.js';
 import customerRoutes from './customer.route.js';
 import saleRoutes from './sale.route.js';
+import purchaseRoutes from './purchase.route.js';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.use('/products', productRoutes);
 router.use('/suppliers', supplierRoutes);
 router.use('/customers', customerRoutes);
 router.use('/sales', saleRoutes);
+router.use('/purchases', purchaseRoutes);
 
 export default router;
 

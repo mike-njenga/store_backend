@@ -832,6 +832,25 @@ export const validateCreatePurchase = [
         .optional()
         .isISO8601()
         .withMessage('purchase_date must be a valid ISO 8601 date'),
+    body('items')
+        .isArray({ min: 1 })
+        .withMessage('items must be a non-empty array'),
+    body('items.*.product_id')
+        .isUUID()
+        .withMessage('Each item must have a valid product_id'),
+    body('items.*.quantity')
+        .isFloat({ min: 0.01 })
+        .withMessage('Each item must have a positive quantity'),
+    body('items.*.unit_price')
+        .isFloat({ min: 0 })
+        .withMessage('Each item must have a non-negative unit_price'),
+    body('items.*.discount')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('Item discount must be a non-negative number'),
+    body('items.*.line_total')
+        .isFloat({ min: 0 })
+        .withMessage('Each item must have a non-negative line_total'),
     handleValidationErrors
 ];
 

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { supabaseAdmin } from '../config/supabase.js';
 import type { CreateSaleInput, CreateSaleItemInput } from '../types/model.types.js';
+import { PaymentMethod } from '../types/model.types.js';
 
 // Create sale with items
 export const createSale = async (req: Request, res: Response) => {
@@ -72,7 +73,7 @@ export const createSale = async (req: Request, res: Response) => {
         const salePayload: CreateSaleInput = {
             ...saleData,
             cashier_id: saleData.cashier_id || userId || null,
-            payment_method: saleData.payment_method || 'cash',
+            payment_method: saleData.payment_method ?? PaymentMethod.CASH,
             discount_amount: saleData.discount_amount ?? 0,
             sale_date: saleData.sale_date || new Date().toISOString(),
         };
