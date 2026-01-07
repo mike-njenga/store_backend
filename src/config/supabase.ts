@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'   
 import config from './env.js'
+
 if (!config.supabase.url || !config.supabase.Anonkey || !config.supabase.serviceRoleKey) {
     throw new Error('Supabase configuration is missing')
 }
@@ -22,8 +23,6 @@ if (!config.supabase.url || !config.supabase.Anonkey || !config.supabase.service
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
-                
-
             }
         }
     );
