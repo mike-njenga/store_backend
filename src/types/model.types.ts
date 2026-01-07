@@ -21,6 +21,7 @@ export enum CustomerType {
 export enum PaymentMethod {
   CASH = 'cash',
   MPESA = 'mpesa',
+  CARD = 'card',
   BANK_TRANSFER = 'bank_transfer',
 }
 
@@ -294,7 +295,7 @@ export interface Purchase {
   purchase_number: number;
   supplier_id: UUID;
   subtotal: number;
-  tax_amount: number;
+  
   discount_amount: number;
   total_amount: number;
   payment_method?: string | null;
