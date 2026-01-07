@@ -130,6 +130,13 @@ export const getUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'User ID is required'
+            });
+        }
+
         // Get user profile
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('user_profiles')
@@ -215,6 +222,13 @@ export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const updateData: UpdateUserProfileInput = req.body;
+
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'User ID is required'
+            });
+        }
 
         // Update user profile
         const { data, error } = await supabaseAdmin
@@ -315,6 +329,13 @@ export const updateOwnProfile = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'User ID is required'
+            });
+        }
 
         // Delete auth user (this will cascade delete profile due to FK constraint)
         const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
