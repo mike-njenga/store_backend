@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { supabaseAdmin } from '../config/supabase.js';
 import type { CreateSaleInput, CreateSaleItemInput } from '../types/model.types.js';
-import { PaymentMethod } from '../types/model.types.js';
+import { PaymentMethod, PaymentStatus } from '../types/model.types.js';
 
 // Create sale with items
 export const createSale = async (req: Request, res: Response) => {
@@ -69,12 +69,35 @@ export const createSale = async (req: Request, res: Response) => {
             }
         }
 
+        // Calculate totals
+        const subtotal = items.reduce((sum, item) => sum + item.line_total, 0);
+        const discountAmount = saleData.discount_amount ?? 0;
+        const totalAmount = subtotal - discountAmount;
+
+        // Determine payment status and amount_paid
+        const paymentMethod = saleData.payment_method ?? PaymentMethod.CASH;
+        const isCashPayment = paymentMethod === PaymentMethod.CASH;
+        const hasCustomer = !!saleData.customer_id;
+        
+        // If cash payment OR no customer (walk-in), mark as paid
+        // Otherwise, if customer exists and not cash, mark as pending (credit sale)
+        const paymentStatus = (isCashPayment || !hasCustomer) 
+            ? PaymentStatus.PAID 
+            : PaymentStatus.PENDING;
+        const amountPaid = (isCashPayment || !hasCustomer) 
+            ? totalAmount 
+            : 0;
+
         // Create sale
-        const salePayload: CreateSaleInput = {
+        const salePayload: CreateSaleInput & { payment_status?: PaymentStatus; amount_paid?: number } = {
             ...saleData,
+            subtotal,
+            total_amount: totalAmount,
             cashier_id: saleData.cashier_id || userId || null,
-            payment_method: saleData.payment_method ?? PaymentMethod.CASH,
-            discount_amount: saleData.discount_amount ?? 0,
+            payment_method: paymentMethod,
+            discount_amount: discountAmount,
+            payment_status: paymentStatus,
+            amount_paid: amountPaid,
             sale_date: saleData.sale_date || new Date().toISOString(),
         };
 

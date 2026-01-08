@@ -233,6 +233,8 @@ export interface Sale {
   discount_amount: number;
   total_amount: number;
   payment_method: PaymentMethod;
+  payment_status?: PaymentStatus | null;
+  amount_paid?: number | null;
   cashier_id?: UUID | null;
   notes?: string | null;
   sale_date: Timestamp;
@@ -456,5 +458,47 @@ export interface PurchaseItemWithProduct extends PurchaseItem {
 
 export interface StockMovementWithProduct extends StockMovement {
   product?: Product | null;
+}
+
+// Customer Payment
+export interface CustomerPayment {
+  id: UUID;
+  sale_id: UUID;
+  customer_id: UUID;
+  amount: number;
+  payment_method: PaymentMethod;
+  reference_number?: string | null;
+  notes?: string | null;
+  recorded_by?: UUID | null;
+  payment_date: Timestamp;
+  created_at: Timestamp;
+}
+
+export interface CreateCustomerPaymentInput {
+  sale_id: UUID;
+  amount: number;
+  payment_method: PaymentMethod;
+  reference_number?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdateCustomerPaymentInput {
+  amount?: number;
+  payment_method?: PaymentMethod;
+  reference_number?: string | null;
+  notes?: string | null;
+}
+
+export interface CustomerPaymentWithSale extends CustomerPayment {
+  sale?: Sale | null;
+}
+
+export interface CustomerPaymentWithCustomer extends CustomerPayment {
+  customer?: Customer | null;
+}
+
+export interface CustomerPaymentWithRelations extends CustomerPayment {
+  sale?: Sale | null;
+  customer?: Customer | null;
 }
 

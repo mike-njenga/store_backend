@@ -10,6 +10,7 @@ import stockMovementRoutes from './stockMovement.route.js';
 import expenseRoutes from './expense.route.js';
 import reportRoutes from './report.route.js';
 import inventoryRoutes from './inventory.route.js';
+import paymentRoutes from './payment.route.js';
 
 const router = express.Router();
 
@@ -25,6 +26,7 @@ router.use('/stock-movements', stockMovementRoutes);
 router.use('/expenses', expenseRoutes);
 router.use('/reports', reportRoutes);
 router.use('/inventory', inventoryRoutes);
+router.use('/payments', paymentRoutes);
 
 export default router;
 

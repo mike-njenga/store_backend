@@ -1131,3 +1131,45 @@ export const validatePagination = [
     handleValidationErrors
 ];
 
+// Payment Validations
+export const validateCreatePayment = [
+    body('sale_id')
+        .notEmpty()
+        .withMessage('sale_id is required')
+        .isUUID()
+        .withMessage('sale_id must be a valid UUID'),
+    body('amount')
+        .notEmpty()
+        .withMessage('amount is required')
+        .isFloat({ min: 0.01 })
+        .withMessage('amount must be greater than 0'),
+    body('payment_method')
+        .notEmpty()
+        .withMessage('payment_method is required')
+        .isIn(Object.values(PaymentMethod))
+        .withMessage(`payment_method must be one of: ${Object.values(PaymentMethod).join(', ')}`),
+    body('reference_number')
+        .optional()
+        .trim()
+        .isLength({ max: 100 })
+        .withMessage('reference_number must not exceed 100 characters'),
+    body('notes')
+        .optional()
+        .trim()
+        .isLength({ max: 500 })
+        .withMessage('notes must not exceed 500 characters'),
+    handleValidationErrors
+];
+
+export const validatePaymentDateRange = [
+    query('start_date')
+        .optional()
+        .isISO8601()
+        .withMessage('start_date must be a valid ISO 8601 date'),
+    query('end_date')
+        .optional()
+        .isISO8601()
+        .withMessage('end_date must be a valid ISO 8601 date'),
+    handleValidationErrors
+];
+
