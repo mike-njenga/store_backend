@@ -3,6 +3,7 @@ import {
     createSale,
     getSales,
     getSaleById,
+    generateReceipt,
     deleteSale,
 } from '../controllers/sale.controller.js';
 import {
@@ -21,6 +22,7 @@ router.use(authenticateUser);
 // Public endpoints (authenticated users can view)
 router.get('/', validatePagination, getSales);
 router.get('/:id', validateUUIDParam('id'), getSaleById);
+router.get('/:id/receipt', validateUUIDParam('id'), generateReceipt);
 
 // Protected endpoints (cashiers+ can create, owner/manager can delete)
 router.post('/', authorizeRole('owner', 'manager', 'cashier'), validateCreateSale, createSale);

@@ -27,11 +27,13 @@
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
+    "pdfkit": "^0.15.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19"
+    "@types/cors": "^2.8.19",
+    "@types/pdfkit": "^0.13.9"
   }
 }

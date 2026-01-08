@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { supabaseAdmin } from '../config/supabase.js';
 import type { CreateSaleInput, CreateSaleItemInput } from '../types/model.types.js';
 import { PaymentMethod, PaymentStatus } from '../types/model.types.js';
+import { generateReceiptPDF } from '../services/receipt.service.js';
 
 // Create sale with items
 export const createSale = async (req: Request, res: Response) => {
@@ -274,6 +275,78 @@ export const getSaleById = async (req: Request, res: Response) => {
         res.status(500).json({
             status: 'error',
             message: 'Internal server error',
+            details: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+// Generate receipt PDF for a sale
+export const generateReceipt = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Sale ID is required',
+            });
+        }
+
+        // Fetch sale with all related data
+        const { data: sale, error } = await supabaseAdmin
+            .from('sales')
+            .select(`
+                *,
+                customer:customers(*),
+                cashier:user_profiles(id, username, full_name, role),
+                items:sale_items(
+                    *,
+                    product:products(*)
+                )
+            `)
+            .eq('id', id)
+            .single();
+
+        if (error || !sale) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Sale not found',
+            });
+        }
+
+        // Handle Supabase array response for relations
+        const saleData = {
+            ...sale,
+            customer: Array.isArray(sale.customer) ? sale.customer[0] : sale.customer,
+            cashier: Array.isArray(sale.cashier) ? sale.cashier[0] : sale.cashier,
+            items: Array.isArray(sale.items) ? sale.items.map((item: any) => ({
+                ...item,
+                product: Array.isArray(item.product) ? item.product[0] : item.product,
+            })) : sale.items,
+        };
+
+        // Generate PDF receipt
+        const pdfBuffer = await generateReceiptPDF({
+            sale: saleData,
+            // Shop information can be configured via environment variables or settings
+            shopName: process.env.SHOP_NAME || 'Hardware Shop',
+            shopAddress: process.env.SHOP_ADDRESS || '',
+            shopPhone: process.env.SHOP_PHONE || '',
+            shopEmail: process.env.SHOP_EMAIL || '',
+        });
+
+        // Set response headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="receipt-${sale.sale_number}.pdf"`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+
+        // Send PDF buffer
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error('Generate receipt error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to generate receipt',
             details: error instanceof Error ? error.message : 'Unknown error',
         });
     }
