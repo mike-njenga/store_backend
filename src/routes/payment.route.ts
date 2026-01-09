@@ -7,7 +7,7 @@ import {
     deletePayment,
 } from '../controllers/payment.controller.js';
 import { authenticateUser } from '../middleware/auth.js';
-import { authorizeRole } from '../middleware/role.js';
+import authorizeRole from '../middleware/role.js';
 import {
     validateCreatePayment,
     validateUUIDParam,

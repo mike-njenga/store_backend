@@ -33,6 +33,7 @@ export const createUser = async (req: Request, res: Response) => {
         // Create user profile
         const userProfile: CreateUserProfileInput = {
             id: authData.user.id,
+            email: authData.user.email || email,
             username,
             full_name,
             role,
@@ -98,7 +99,7 @@ export const login = async (req: Request, res: Response) => {
         // Get user profile
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('user_profiles')
-            .select('id, username, full_name, role, phone, is_active')
+            .select('id, email, username, full_name, role, phone, is_active')
             .eq('id', data.user.id)
             .single();
 
@@ -133,7 +134,7 @@ export const login = async (req: Request, res: Response) => {
             message: 'Login successful',
             user: {
                 id: profile.id,
-                email: data.user.email,
+                email: profile.email,
                 username: profile.username,
                 full_name: profile.full_name,
                 role: profile.role,

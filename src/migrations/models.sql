@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- User profiles (extends Supabase auth.users)
 CREATE TABLE user_profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('owner', 'manager', 'cashier', 'staff')),
@@ -45,7 +46,6 @@ CREATE TABLE products (
     wholesale_price NUMERIC(10, 2),
     min_stock_level INTEGER DEFAULT 0,
     reorder_quantity INTEGER DEFAULT 0,
-    shelf_location VARCHAR(50),
     supplier_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -84,7 +84,7 @@ CREATE TABLE sales (
     sale_number SERIAL UNIQUE,
     customer_id UUID,
     subtotal NUMERIC(10, 2) NOT NULL DEFAULT 0,
-    tax_amount NUMERIC(10, 2) DEFAULT 0,
+   
     discount_amount NUMERIC(10, 2) DEFAULT 0,
     total_amount NUMERIC(10, 2) NOT NULL DEFAULT 0,
     payment_method VARCHAR(20) DEFAULT 'cash' CHECK (payment_method IN ('cash', 'mpesa', 'card', 'bank_transfer')),
@@ -114,7 +114,6 @@ CREATE TABLE purchases (
     purchase_number SERIAL UNIQUE,
     supplier_id UUID NOT NULL,
     subtotal NUMERIC(10, 2) NOT NULL DEFAULT 0,
-    tax_amount NUMERIC(10, 2) DEFAULT 0,
     discount_amount NUMERIC(10, 2) DEFAULT 0,
     total_amount NUMERIC(10, 2) NOT NULL DEFAULT 0,
     payment_method VARCHAR(50),
@@ -323,6 +322,7 @@ CREATE INDEX idx_stock_movements_sale_item ON stock_movements(sale_item_id);
 CREATE INDEX idx_stock_movements_purchase_item ON stock_movements(purchase_item_id);
 CREATE INDEX idx_inventory_product ON inventory(product_id);
 CREATE INDEX idx_user_profiles_role ON user_profiles(role);
+CREATE INDEX idx_user_profiles_email ON user_profiles(email);
 
 -- Row Level Security (RLS) Policies
 -- Enable RLS on all tables

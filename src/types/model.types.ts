@@ -49,6 +49,7 @@ export enum AdjustmentReason {
 // User Profile
 export interface UserProfile {
   id: UUID;
+  email: string;
   username: string;
   full_name: string;
   role: UserRole;
@@ -60,6 +61,7 @@ export interface UserProfile {
 
 export interface CreateUserProfileInput {
   id: UUID;
+  email: string;
   username: string;
   full_name: string;
   role: UserRole;
@@ -68,6 +70,7 @@ export interface CreateUserProfileInput {
 }
 
 export interface UpdateUserProfileInput {
+  email?: string;
   username?: string;
   full_name?: string;
   role?: UserRole;

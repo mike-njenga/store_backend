@@ -219,6 +219,7 @@ export const validateCreateUserProfile = [
 
 // User updating their own profile - cannot change role or is_active
 export const validateUpdateOwnProfile = [
+    emailValidation('email', true),
     body('username')
         .optional()
         .trim()
@@ -248,6 +249,7 @@ export const validateUpdateOwnProfile = [
 
 // Admin updating user profile - can change all fields including role and is_active
 export const validateUpdateUserProfile = [
+    emailValidation('email', true),
     body('username')
         .optional()
         .trim()

@@ -5,7 +5,19 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import config from './config/env.js';
-import apiRoutes from './routes/index.js';
+//rotes
+import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
+import productRoutes from './routes/product.route.js';
+import supplierRoutes from './routes/supplier.route.js';
+import customerRoutes from './routes/customer.route.js';
+import saleRoutes from './routes/sale.route.js';
+import purchaseRoutes from './routes/purchase.route.js';
+import stockMovementRoutes from './routes/stockMovement.route.js';
+import expenseRoutes from './routes/expense.route.js';
+import reportRoutes from './routes/report.route.js';
+import inventoryRoutes from './routes/inventory.route.js';
+import paymentRoutes from './routes/payment.route.js';
 
 const app = express();
 
@@ -54,8 +66,20 @@ if (config.rateLimit.enable) {
      });
   });
 
-  // api routes 
-app.use('/api', apiRoutes);
+
+// Mount route modules
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/sales', saleRoutes);
+app.use('/api/purchases', purchaseRoutes);
+app.use('/api/stock-movements', stockMovementRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

@@ -32,6 +32,7 @@ export const createUser = async (req: Request, res: Response) => {
         // Create user profile
         const userProfile: CreateUserProfileInput = {
             id: authData.user.id,
+            email: authData.user.email || email,
             username,
             full_name,
             role,
@@ -84,7 +85,7 @@ export const getUsers = async (req: Request, res: Response) => {
 
         let query = supabaseAdmin
             .from('user_profiles')
-            .select('id, username, full_name, role, phone, is_active, created_at, updated_at', { count: 'exact' })
+            .select('id, email, username, full_name, role, phone, is_active, created_at, updated_at', { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(offset, offset + Number(limit) - 1);
 
@@ -140,7 +141,7 @@ export const getUserById = async (req: Request, res: Response) => {
         // Get user profile
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('user_profiles')
-            .select('id, username, full_name, role, phone, is_active, created_at, updated_at')
+            .select('id, email, username, full_name, role, phone, is_active, created_at, updated_at')
             .eq('id', id)
             .single();
 
@@ -150,16 +151,10 @@ export const getUserById = async (req: Request, res: Response) => {
                 message: 'User not found'
             });
         }
-
-        // Get auth user email
-        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(id);
         
         res.status(200).json({
             status: 'success',
-            user: {
-                ...profile,
-                email: authUser?.user?.email || null,
-            }
+            user: profile
         });
     } catch (error) {
         console.error('Get user error:', error);
@@ -186,7 +181,7 @@ export const getOwnProfile = async (req: Request, res: Response) => {
         // Get user profile
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('user_profiles')
-            .select('id, username, full_name, role, phone, is_active, created_at, updated_at')
+            .select('id, email, username, full_name, role, phone, is_active, created_at, updated_at')
             .eq('id', userId)
             .single();
 
@@ -196,16 +191,10 @@ export const getOwnProfile = async (req: Request, res: Response) => {
                 message: 'User profile not found'
             });
         }
-
-        // Get auth user email
-        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
         
         res.status(200).json({
             status: 'success',
-            user: {
-                ...profile,
-                email: authUser?.user?.email || null,
-            }
+            user: profile
         });
     } catch (error) {
         console.error('Get own profile error:', error);
@@ -228,6 +217,20 @@ export const updateUser = async (req: Request, res: Response) => {
                 status: 'error',
                 message: 'User ID is required'
             });
+        }
+
+        // Update auth email if email is being changed
+        if (updateData.email) {
+            const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+                email: updateData.email
+            });
+            if (authError) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Failed to update email in auth',
+                    details: authError.message
+                });
+            }
         }
 
         // Update user profile
@@ -286,10 +289,25 @@ export const updateOwnProfile = async (req: Request, res: Response) => {
 
         // Prevent role and is_active changes
         const allowedUpdates: UpdateUserProfileInput = {
+            email: updateData.email,
             username: updateData.username,
             full_name: updateData.full_name,
             phone: updateData.phone,
         };
+
+        // Update auth email if email is being changed
+        if (allowedUpdates.email) {
+            const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+                email: allowedUpdates.email
+            });
+            if (authError) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Failed to update email in auth',
+                    details: authError.message
+                });
+            }
+        }
 
         // Update user profile
         const { data, error } = await supabaseAdmin
